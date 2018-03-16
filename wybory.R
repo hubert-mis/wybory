@@ -87,25 +87,7 @@ elect.sym <- function(datacons, survey, freq=.6, blankp=.05, res=1.5){
   return(datacons)
 }
 
-##########################################
+#Dane o okregach wyborczych
+data_cons <- read.csv(file = "https://raw.githubusercontent.com/hubertmis1/wybory/master/OkregiWyborcze.csv", sep=";")
 
 
-#Adres pliku zawierajacego dane o okregach, konieczna odpowiednie ulozenie danych
-daneokregi <- read.csv(file = "C:/Users/huber/Desktop/AGH/Informatyka Ekonomiczna/Wybory/OkregiWyborcze.csv", sep=";")
-
-#Dane sondazowe, bez ograniczen w liczbie partii
-survey <- c(10,30,20)
-
-#Utworzenie ramki danych zawierajacej dokladna symulacje wyborow, 
-data <- elect.sym(daneokregi, survey)
-View(data)
-
-#histogram ilosci mandatow
-parties <- length(survey)
-wd <- ncol(data)
-u <- as.numeric(data[nrow(data),((wd-parties+1):wd)])
-
-text(barplot(u, names.arg = namess("Partia",length(survey))), 10,u)
-
-#opcjonalne zapisanie symulacji do pliku csv, dokladna symulacja
-#write.csv2(data, file = "Symulacja wyborow.csv")
