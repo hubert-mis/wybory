@@ -112,3 +112,31 @@ elect.sym <- function(datacons, survey, freq=.6, blankp=.05, res=1.5, method=dho
 data_cons <- read.csv(file = "https://raw.githubusercontent.com/hubertmis1/wybory/master/OkregiWyborcze.csv", sep=";")
 
 
+#############################
+
+# Zad3
+
+# freq <- .5
+# # 
+# surv2 <- .2
+# surv3 <- .3
+
+elect.major <- function(surv2, surv3, freq = .5, voters = 30629150, mandates = 460){
+  allvotes <- round(freq * voters, 0)
+  votes2 <- round(surv2 * allvotes, 0)
+  votes3 <- round(surv3 * allvotes, 0)
+  for(i in seq(from = .8*(votes2+votes3), to = allvotes - (votes2 + votes3), by = 10)){
+    votes <- c(i, votes2, votes3)
+    dh <- dhondt(votes, mandates)
+    #print(dh[1])
+    if (dh[1] > mandates/2){
+      return(i)
+    }
+  }
+  return (FALSE)
+}
+
+now<-Sys.time()
+elect.major(.2, .2)
+Sys.time()-now
+
