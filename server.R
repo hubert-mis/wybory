@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+library(ggplot2)
 source("wybory.R")
 
 server <- function(input, output) {
@@ -18,25 +19,35 @@ server <- function(input, output) {
   freq <- reactive({
     as.numeric(input$fr)
   })
-  
-  # output$trial <- reactive({
-  #   surv()
-  #   
-  # })
 
-  xdd <- eventReactive(input$button, {
-    elect.sym(data_cons, surv(), freq()/100)
+  data <- eventReactive(input$button, {
+    if(input$rad == 1)
+      elect.sym(data_cons, surv(), freq()/100)
+    else if (input$rad == 2)
+      elect.sym(data_cons, surv(), freq()/100, method = saintlague)
   })
-  output$table1 <- renderTable({
-    xdd()
+  
+  a <- reactive({
+    data()[nrow(data()), (ncol(data()) - 2) : ncol(data())]
   })
+  b <- reactive({
+    data.frame(mandaty = c(a()[1,1], a()[1,2], a()[1,3]),
+               partie = c("Partia 1", "Partia 2", "Partia 3"))
+  })
+  output$plot1 <- renderPlot({
+    ggplot(data = b(), aes(x=partie, y=mandaty)) +
+      geom_bar(stat="identity", fill="steelblue") +
+      geom_text(aes(label=mandaty), vjust=1.6, color="white", size=4.5)+
+      theme_minimal()
+  })
+  output$table1 <- renderTable({data()})
+
   
   output$downloadData <- downloadHandler(
     filename = function(){
-      paste0("Symulacja", ".csv")
-    },
+      paste0("Symulacja", ".csv" )},
+    
     content = function(file) {
-      write.csv(xdd(), file, row.names = FALSE, sep = ';', dec = ',')
-    }
-  )
+      write.csv(data(), file, row.names = FALSE, sep = ';', dec = ',')
+    })
 }

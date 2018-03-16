@@ -21,12 +21,16 @@ ui <- fluidPage(
       textInput("par2", h5("Partia 2"), "20"),
       textInput("par3", h5("Partia 3"), "10"),
       textInput("fr", h5("Nie ide na wybory"), "40"),
+      radioButtons("rad", "Metoda liczenia głosów",
+                   c("D`Hondt" = 1, 
+                     "Saint-Lague" = 2)),
       br(),actionButton("button", "Run"),
       downloadButton('downloadData', 'Download')
     ),
     
     # Show a plot of the generated distribution
     mainPanel(
+      plotOutput("plot1")
       tableOutput("table1")
       # verbatimTextOutput("trial")
     )

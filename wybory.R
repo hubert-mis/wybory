@@ -18,6 +18,26 @@ dhondt <- function(votes, mandates){
   return(given)
 }
 
+#podzial mandatow metoda Sainte-Lague
+saintlague <- function(votes, mandates){
+  parties<-length(votes)
+  given<-rep(0,parties)
+  dhondtlist<-rep(votes)
+  
+  for(i in 1:mandates){
+    max<-1
+    for(j in 1:parties){
+      if(dhondtlist[j]>max){
+        max<-dhondtlist[j]
+        index<-j
+      }
+    }
+    given[index]<-(given[index]+1)
+    dhondtlist[index]<-votes[index]/(2*given[index]+1)
+  }
+  return(given)
+}
+
 #sprawdzenie czy partie przekroczyly staly prog wyborczy
 elect.thres <- function(votes, threshold){
   list <- c()
@@ -42,7 +62,8 @@ namess <- function(text, n){
 #wektor z wynikami sondazu oraz frekwencja podana jako liczba z przedzialu <0,1>
 #domyslnie 60% procent glosow niewaznych domyslnie 5% oraz 
 #odchylenie standardowe bledu rozkladu sondazu
-elect.sym <- function(datacons, survey, freq=.6, blankp=.05, res=1.5){
+elect.sym <- function(datacons, survey, freq=.6, blankp=.05, res=1.5, method=dhondt){
+  
   parties<-length(survey)
   constituencies<-length(datacons$Nr.okregu)
   
@@ -67,7 +88,7 @@ elect.sym <- function(datacons, survey, freq=.6, blankp=.05, res=1.5){
   mandates<-matrix(rep(0,parties*constituencies), nrow = constituencies)
   colnames(mandates) <- namess("Mandaty dla partii", parties)
   for(i in 1:constituencies){
-    mandates[i, threshold] <- dhondt(votes[i, threshold], datacons$Liczba.mandatow[i])
+    mandates[i, threshold] <- method(votes[i, threshold], datacons$Liczba.mandatow[i])
   }
   
   mandates <- rbind(mandates,colSums(mandates))
